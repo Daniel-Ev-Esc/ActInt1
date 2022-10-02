@@ -3,6 +3,8 @@
 #include<fstream>
 #include<vector>
 #include<string>
+#include<set>
+#include<utility>
 
 using namespace std;
 
@@ -55,17 +57,76 @@ void palindromoMasGrande(vector<string> transmisiones, ofstream& check){
     
 }
 
-// Complejidad: Pendiente*********************************************************************
+// Complejidad: O(nm)
+// Donde n es la longitud del string y m es la longitud del substring a buscar
+// Recibe un string y un substring a buscar y regresa el número de veces que aparece ese substring en el string
+int contarSubseq(string str, string subs) {
+    int n = str.length(),m = subs.length();
+
+    if (n <= 0) return 0; // Si el string esta vacío regresa 0, no hay substrings
+    if (m <= 0) return 1; // Si el substring a buscar está vacío, el unico substring es null
+    
+    vector<vector<int>> mat (m,vector<int> (n,0)); // Matriz
+
+    mat[0][0] = (str[0] == subs[0]) ? 1 : 0; // Si el primer caracter de ambos strings es el mismo, pone 1 
+
+    for (int i = 1; i < n; i++) { // Inicializar primera fila
+        mat[0][i] = (str[i] == subs[0]) ? mat[0][i-1] + 1 : mat[0][i-1]; 
+    }
+
+    for (int i = 1; i < m; i++) { // Inicializar primera columna que nunca tendrá coincidencias
+        mat[i][0] = 0;
+    }
+    
+    for (int i = 1; i < m; i++) { // A lo largo de la matriz, si los caracteres coinciden, sumamos las coincidencias que tenemos hasta el momento
+        for (int j = 1; j < n; j++) {
+            mat[i][j] = (str[j] == subs[i]) ? mat[i-1][j-1] + mat[i][j-1] : mat[i][j-1];
+        }
+        
+    }
+    
+    // Regresa el total de coincidencias
+    return mat[m-1][n-1];
+}
+
+// Complejidad: O(x(x-1)*y)
+// Donde x es la longitud del código, que eventualmente se pasa con un caracter menos y y es la longitud del string
 // Busca la subsecuencia del código menos un caracter que más se repite en la transmisión
-void encontrarSubsequencia(string codigo, vector<string> transmisiones, ofstream& check){
-    string sub = "A";
-    int cant = 0;
-    int archivo = 1;
+pair<int,string> encontrarSubsequencia(string codigo, string transmision){
+    
+    set<string> grupo;
+    vector<pair<int,string>> subseq;
 
-    // Código del cálculo
+    // Por cada caracter se guarda el string de el string original menos un caracter
+    for (int i = 0; i < codigo.length(); i++) {
+        string menosuno = "";
+        
+        for (int j = 0; j < codigo.length(); j++) {
+            if (j != i) menosuno += codigo[j]; 
+        }
+        
+        grupo.insert(menosuno);
+    }
 
-    check << "La subsecuencia más encontrada es: " << sub << " con " << cant << " veces en el archivo" << endl;
-    check << "Transmisión" << archivo << ".txt" << endl;
+    // Por cada subsequencia almacenamos la cantidad de apariciones de esa subsequencia
+    for (string x: grupo) {
+        pair<int,string> reps (0,x);
+        if(x != "") reps.first = contarSubseq(transmision, x);
+        else reps.second = "null";
+        subseq.push_back(reps);
+    }
+
+    pair<int,string> max (1,"null");
+
+    // Buscar la subsequencia que más apareció
+    for (int i = 0; i < subseq.size(); i++) {
+        if (subseq[i].first >= max.first) {
+            if (subseq[i].first == 1) max.second = subseq[i].second;      
+            max = subseq[i];
+        }
+    }
+
+    return max;
 }
 
 // Complejidad: Pendiente*********************************************************************
@@ -99,8 +160,26 @@ void incidenciasCodigo(string codigo, vector<string> transmisiones, ofstream& ch
 
     }
 
-    encontrarSubsequencia(codigo, transmisiones, check);
+    vector<pair<int,string>> subseq;
 
+    for (int i = 0; i < transmisiones.size(); i++) { // Llamar al buscador de subsequencia por cada transmision
+        subseq.push_back(encontrarSubsequencia(codigo, transmisiones[i]));
+    }
+
+    int arch;
+    pair<int,string> max (0,"null");
+
+    // Buscar el archivo donde se encontraron más subsequencias
+    for (int i = 0; i < subseq.size(); i++) {
+        if (subseq[i].first > max.first) {
+            max = subseq[i];
+            arch = i+1;
+        }
+    }
+    
+    check << "La subsecuencia más encontrada es: " << max.second << " con " << max.first << " veces en el archivo" << endl;
+    check << "Transmisión" << arch << ".txt" << endl;
+    
     check << "--------------" << endl;
 }
 
