@@ -7,6 +7,8 @@
 
 using namespace std;
 
+#define MAXSTR 1001
+
 // Complejidad: O(m*n)
 // Compara dos strings y devuelve el substring más largo encontrado
 string compararStrings(string t1, string t2){
@@ -16,7 +18,7 @@ string compararStrings(string t1, string t2){
     int n = t2.length();
     int result = 0;
     int end;
-    int len[2][n + 1];
+    int len[2][MAXSTR];
     int currRow = 0;
  
     for (int i = 0; i <= m; i++) {
