@@ -1,22 +1,11 @@
 //A00831289 Daniel Evaristo Escalera Bonilla
+//A01284373 Andres Aguirre Rodriguez
 #include<iostream>
 #include<fstream>
 #include<vector>
 #include<string>
 
 using namespace std;
-
-<<<<<<< Updated upstream
-// Complejidad: Pendiente*********************************************************************
-// Compara dos strings y devuelve el substring más largo encontrado
-string compararStrings(string t1, string t2){
-    string substring = "A";
-
-    // Código para cálculo
-
-    return substring;
-=======
-#define MAXSTR 1001
 
 // Complejidad: O(m*n)
 // Compara dos strings y devuelve el substring más largo encontrado
@@ -27,7 +16,7 @@ string compararStrings(string t1, string t2){
     int n = t2.length();
     int result = 0;
     int end;
-    int len[2][MAXSTR];
+    int len[2][n + 1];
     int currRow = 0;
  
     for (int i = 0; i <= m; i++) {
@@ -55,7 +44,6 @@ string compararStrings(string t1, string t2){
  
     return t1.substr(end - result + 1, result);
     //return substring;
->>>>>>> Stashed changes
 }
 
 // Complejidad: Pendiente*********************************************************************
