@@ -6,6 +6,7 @@
 
 using namespace std;
 
+<<<<<<< Updated upstream
 // Complejidad: Pendiente*********************************************************************
 // Compara dos strings y devuelve el substring más largo encontrado
 string compararStrings(string t1, string t2){
@@ -14,6 +15,47 @@ string compararStrings(string t1, string t2){
     // Código para cálculo
 
     return substring;
+=======
+#define MAXSTR 1001
+
+// Complejidad: O(m*n)
+// Compara dos strings y devuelve el substring más largo encontrado
+string compararStrings(string t1, string t2){
+    //string substring = "A";
+
+    int m = t1.length();
+    int n = t2.length();
+    int result = 0;
+    int end;
+    int len[2][MAXSTR];
+    int currRow = 0;
+ 
+    for (int i = 0; i <= m; i++) {
+        for (int j = 0; j <= n; j++) {
+            if (i == 0 || j == 0) {
+                len[currRow][j] = 0;
+            }
+            else if (t1[i - 1] == t2[j - 1]) {
+                len[currRow][j] = len[1 - currRow][j - 1] + 1;
+                if (len[currRow][j] > result) {
+                    result = len[currRow][j];
+                    end = i - 1;
+                }
+            }
+            else {
+                len[currRow][j] = 0;
+            }
+        }
+ 
+        currRow = 1 - currRow;
+    }
+    if (result == 0) {
+        return "-1";
+    }
+ 
+    return t1.substr(end - result + 1, result);
+    //return substring;
+>>>>>>> Stashed changes
 }
 
 // Complejidad: Pendiente*********************************************************************
