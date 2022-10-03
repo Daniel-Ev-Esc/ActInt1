@@ -4,6 +4,7 @@
 #include<fstream>
 #include<vector>
 #include<string>
+#include<set>
 
 using namespace std;
 
@@ -88,19 +89,6 @@ void palindromoMasGrande(vector<string> transmisiones, ofstream& check){
 }
 
 // Complejidad: Pendiente*********************************************************************
-// Busca la subsecuencia del código menos un caracter que más se repite en la transmisión
-void encontrarSubsequencia(string codigo, vector<string> transmisiones, ofstream& check){
-    string sub = "A";
-    int cant = 0;
-    int archivo = 1;
-
-    // Código del cálculo
-
-    check << "La subsecuencia más encontrada es: " << sub << " con " << cant << " veces en el archivo" << endl;
-    check << "Transmisión" << archivo << ".txt" << endl;
-}
-
-// Complejidad: Pendiente*********************************************************************
 // Busca las coincidencias del código en la transmision y regresa sus posiciones en el string
 vector<int> revisionCodigo(string codigo, string tr){
     vector<int> incidencias;
@@ -110,6 +98,46 @@ vector<int> revisionCodigo(string codigo, string tr){
     incidencias.push_back(1);
 
     return incidencias;
+}
+
+// Complejidad: O(nm)
+// Donde n es la cantidad de subsecuencias del codigo menos uno diferente y m la longitud del string
+// Obtiene la subsecuencia que más se encuentra en la transmisión
+pair<int,string> encontrarSubsequencia(string codigo, string transmision){
+    
+    set<string> grupo;
+    vector<pair<int,string>> subseq;
+
+    for (int i = 0; i < codigo.length(); i++) {
+        
+        string menosuno = "";
+        
+        for (int j = 0; j < codigo.length(); j++) {
+            if (j != i) menosuno += codigo[j];
+        }
+        
+        grupo.insert(menosuno);
+    }
+
+    for (string x: grupo)
+    {
+        pair<int,string> reps (0,x);
+        reps.first = revisionCodigo(transmision, x).size();
+        subseq.push_back(reps);
+    }
+
+    pair<int,string> max (1,"null");
+
+    for (int i = 0; i < subseq.size(); i++)
+    {
+        if (subseq[i].first > max.first)
+        {
+            max = subseq[i];
+        }
+        
+    }
+
+    return max;
 }
 
 // Complejidad: Pendiente*********************************************************************
@@ -131,8 +159,30 @@ void incidenciasCodigo(string codigo, vector<string> transmisiones, ofstream& ch
 
     }
 
-    encontrarSubsequencia(codigo, transmisiones, check);
+    
+    vector<pair<int,string>> subseq;
 
+    for (int i = 0; i < transmisiones.size(); i++)
+    {
+        subseq.push_back(encontrarSubsequencia(codigo, transmisiones[i]));
+    }
+
+    int arch;
+    pair<int,string> max (0,"null");
+
+    for (int i = 0; i < subseq.size(); i++)
+    {
+        if (subseq[i].first > max.first)
+        {
+            max = subseq[i];
+            arch = i+1;
+        }
+        
+    }
+    
+    check << "La subsecuencia más encontrada es: " << max.second << " con " << max.first << " veces en el archivo" << endl;
+    check << "Transmisión" << arch << ".txt" << endl;
+    
     check << "--------------" << endl;
 }
 
