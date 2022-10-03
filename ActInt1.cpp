@@ -68,19 +68,69 @@ void encontrarSubsequencia(string codigo, vector<string> transmisiones, ofstream
     check << "Transmisión" << archivo << ".txt" << endl;
 }
 
-// Complejidad: Pendiente*********************************************************************
-// Busca las coincidencias del código en la transmision y regresa sus posiciones en el string
-vector<int> revisionCodigo(string codigo, string tr){
-    vector<int> incidencias;
+// Complejidad: O(m) m es la longitud del patron
+// Preprocesamiento: Longest Proper Prefix which is also a suffix
+vector<int> lps (string p) {
+    int n = p.length();
+    vector<int> lpsv(n, 0);
 
+    int j = 0, i = 1;
+
+    while (i < n) {
+        if (p[i] == p[j]) {
+            lpsv[i] = j + 1;
+            j++;
+            i++;
+        }
+        else {
+            if (j == 0) {
+                lpsv[i] = 0;
+                i++;
+            }
+            else {
+                j = lpsv[j - 1];
+            }
+        }
+    }
+
+    return lpsv;
+}
+
+// Complejidad: O(n + m) n es la longitud del texto y m es la longitud del patron
+/* Busca las coincidencias del código en la transmision y regresa sus posiciones en el string.
+Esta función esta basada en el algoritmo de KMP (Knuth-Morris-Pratt)
+*/
+vector<int> revisionCodigo(string codigo, string tr){
     // Código de cálculo
 
-    incidencias.push_back(1);
+    vector<int> incidencias;
+    vector<int> lpsv = lps(codigo);
+
+    int j = 0, i = 0, n = tr.length(), m = codigo.length();
+
+    while (i < n) {
+        if (tr[i] == codigo[j]) {
+            i++;
+            j++;
+            if (j == m) {
+                incidencias.push_back(i - m);
+                j = lpsv[j - 1];
+            }
+        }
+        else {
+            if (j == 0) {
+                i++;
+            }
+            else {
+                j = lpsv[j - 1];
+            }
+        }
+    }
 
     return incidencias;
 }
 
-// Complejidad: Pendiente*********************************************************************
+// Complejidad: O(n*m) ??**
 // Recibe el código a buscar en las transmisiones y despliega las incidencias y su cantidad
 // Asi como la subsequencia con un caracter menos más común
 void incidenciasCodigo(string codigo, vector<string> transmisiones, ofstream& check){
@@ -91,14 +141,22 @@ void incidenciasCodigo(string codigo, vector<string> transmisiones, ofstream& ch
         vector<int> incidencias = revisionCodigo(codigo,transmisiones[i]);
 
         check << "Transmission" << i+1 << ".txt ==> " << incidencias.size() << "  veces" << endl;
-
-        for (int i = 0; i < incidencias.size()-1; i++) {
-            check << incidencias[i] << ", ";
+        if (incidencias.size() > 0) {
+            for (int i = 0; i < incidencias.size()-1; i++) {
+                check << incidencias[i];
+                
+                if (i != incidencias.size() - 1) {
+                    check << ", ";
+                }
+                else {
+                    check << endl;
+                }
+            }
+            check << incidencias[incidencias.size()-1];
         }
-        check << incidencias[incidencias.size()-1] << endl;
-
+        check << endl;
     }
-
+    
     encontrarSubsequencia(codigo, transmisiones, check);
 
     check << "--------------" << endl;
