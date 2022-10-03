@@ -144,7 +144,8 @@ pair<int,string> manacher(string tr){
     return pal;
 }
 
-// Complejidad: Pendiente*********************************************************************
+// Complejidad: O(n)
+// Donde n es la longitud de la transmisión más grande
 // Busca el palíndromo más grande en la transmisión
 void palindromoMasGrande(vector<string> transmisiones, ofstream& check){
     check << "Palíndromo más grande:" << endl;
@@ -161,9 +162,6 @@ void palindromoMasGrande(vector<string> transmisiones, ofstream& check){
     }
     
 }
-
-// Complejidad: Pendiente*********************************************************************
-
 
 // Complejidad: O(m) m es la longitud del patron
 // Preprocesamiento: Longest Proper Prefix which is also a suffix
@@ -282,7 +280,7 @@ void incidenciasCodigo(string codigo, vector<string> transmisiones, ofstream& ch
         check << "Transmission" << i+1 << ".txt ==> " << incidencias.size() << "  veces" << endl;
         if (incidencias.size() > 0) {
             for (int i = 0; i < incidencias.size()-1; i++) {
-                check << incidencias[i];
+                check << incidencias[i] + 1;
                 
                 if (i != incidencias.size() - 1) {
                     check << ", ";
@@ -291,7 +289,7 @@ void incidenciasCodigo(string codigo, vector<string> transmisiones, ofstream& ch
                     check << endl;
                 }
             }
-            check << incidencias[incidencias.size()-1];
+            check << incidencias[incidencias.size()-1] + 1;
         }
         check << endl;
     }
@@ -389,5 +387,4 @@ int main(){
 
     return 0;
     
-
 }
