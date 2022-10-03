@@ -176,7 +176,8 @@ pair<int,string> encontrarSubsequencia(string codigo, string transmision){
     for (string x: grupo)
     {
         pair<int,string> reps (0,x);
-        reps.first = revisionCodigo(transmision, x).size();
+        vector<int> incSubseq = revisionCodigo(x, transmision);
+        reps.first = incSubseq.size();
         subseq.push_back(reps);
     }
 
