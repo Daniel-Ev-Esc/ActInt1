@@ -68,6 +68,82 @@ void substringMasLargo(vector<string> transmisiones, ofstream& check){
     
 }
 
+// Complejidad: O(n)
+// Donde n es la longitud del string
+// Encuentra el palindromo más grande dentro del string
+// Modificación del algoritmo de manacher para que también devuelva el indice de inicio
+pair<int,string> manacher(string tr){
+
+    int n = tr.length();
+    string palindromo = "";
+
+    for (int i = 0; i < n; i++) {
+        palindromo += "-";
+        palindromo += tr[i];
+    }
+    palindromo += "-";
+    n = palindromo.length();
+    vector<int> l(n);
+
+    l[0] = 0;
+    l[1] = 1;
+
+    int mLong = 0, mCenter = 0;
+    bool e;
+
+    for (int c=1, li=0, ri=2; ri < n; ri++)
+    {
+        li = c-(ri-c);
+        e = false;
+        if (c-mLong <= ri && ri >= mLong)
+        {
+            if (l[li] < (c+l[c]-ri))
+            {
+                l[ri] = l[li];
+            }
+            else if (l[li] == (c+l[c]) - ri && (c+l[c]) == 2*n){
+                l[ri] = l[li];
+            }
+            else if (l[li] == (c+l[c]) - ri && (c+l[c]) < 2*n){
+                l[ri] = l[li];
+                e = true;
+            }
+            else if (l[li] > (c+l[c]) - ri && (c+l[c]) < 2*n){
+                l[ri] = (c+l[c]) - ri;
+                e = true;
+            }
+        }
+        else{
+            l[ri] = 0;
+            e = true; 
+        }
+        if (e)
+        {
+            while ((ri + l[ri] < n) && (ri-l[ri]>0) && (palindromo[ri-l[ri]-1] == palindromo[ri+l[ri]+1]))
+            {
+                l[ri]++;
+            }
+            
+        }
+        c = ri;
+        if (l[ri] > mLong)
+        {
+            mLong = l[ri];
+            mCenter = ri;
+        } 
+    }
+    int ini = (mCenter - mLong)/2;
+    string salida ="";
+    for (int i = ini; i < (ini+mLong); i++)
+    {
+        salida += tr[i];
+    }
+
+    pair<int,string> pal (ini,salida);
+    
+    return pal;
+}
+
 // Complejidad: Pendiente*********************************************************************
 // Busca el palíndromo más grande en la transmisión
 void palindromoMasGrande(vector<string> transmisiones, ofstream& check){
@@ -75,13 +151,11 @@ void palindromoMasGrande(vector<string> transmisiones, ofstream& check){
 
     for (int i = 0; i < transmisiones.size(); i++)
     {
-        int pos = 1;
-        string palindromo = "A";
+        
+        pair<int,string> palindromo = manacher(transmisiones[i]);
 
-        // Código para cálculo
-
-        check << "Transmission" << i+1 << ".txt" << " ==> Posición: " << pos << endl;
-        check << palindromo << endl;
+        check << "Transmission" << i+1 << ".txt ==> Posición: " << palindromo.first << endl;
+        check << palindromo.second << endl;
 
         if(i < transmisiones.size()-1) check << "----" << endl;
     }
