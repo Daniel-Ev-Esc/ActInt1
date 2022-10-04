@@ -1,5 +1,8 @@
-//A00831289 Daniel Evaristo Escalera Bonilla
-//A01284373 Andres Aguirre Rodriguez
+/*
+A00831289 Daniel Evaristo Escalera Bonilla
+A01284373 Andres Aguirre Rodriguez
+A00831719 Alberto Horacio Orozco Ramos 
+*/
 #include<iostream>
 #include<fstream>
 #include<vector>
@@ -314,9 +317,14 @@ void incidenciasCodigo(string codigo, vector<string> transmisiones, ofstream& ch
         }
         
     }
-    
-    check << "La subsecuencia más encontrada es: " << max.second << " con " << max.first << " veces en el archivo" << endl;
-    check << "Transmisión" << arch << ".txt" << endl;
+
+    if (max.second != "null") {
+        check << "La subsecuencia más encontrada es: " << max.second << " con " << max.first << " veces en el archivo" << endl;
+        check << "Transmisión" << arch << ".txt" << endl;
+    }
+    else {
+        check << "La subsecuencia más encontrada es: No se encontró ninguna subsecuencia" << endl;
+    }
     
     check << "--------------" << endl;
 }
