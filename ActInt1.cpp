@@ -163,6 +163,12 @@ void palindromoMasGrande(vector<string> transmisiones, ofstream& check){
     
 }
 
+<<<<<<< HEAD
+=======
+// Complejidad: Pendiente*********************************************************************
+
+
+>>>>>>> fc4a675e947445d17474683ec0d37183afeae9c4
 // Complejidad: O(m) m es la longitud del patron
 // Preprocesamiento: Longest Proper Prefix which is also a suffix
 vector<int> lps (string p) {
@@ -248,8 +254,12 @@ pair<int,string> encontrarSubsequencia(string codigo, string transmision){
     for (string x: grupo)
     {
         pair<int,string> reps (0,x);
+<<<<<<< HEAD
         vector<int> incSubseq = revisionCodigo(x, transmision);
         reps.first = incSubseq.size();
+=======
+        reps.first = revisionCodigo(transmision, x).size();
+>>>>>>> fc4a675e947445d17474683ec0d37183afeae9c4
         subseq.push_back(reps);
     }
 
@@ -314,6 +324,7 @@ void incidenciasCodigo(string codigo, vector<string> transmisiones, ofstream& ch
         }
         
     }
+<<<<<<< HEAD
 
     if (max.second != "null") {
         check << "La subsecuencia más encontrada es: " << max.second << " con " << max.first << " veces en el archivo" << endl;
@@ -324,6 +335,11 @@ void incidenciasCodigo(string codigo, vector<string> transmisiones, ofstream& ch
     }
     
 
+=======
+    
+    check << "La subsecuencia más encontrada es: " << max.second << " con " << max.first << " veces en el archivo" << endl;
+    check << "Transmisión" << arch << ".txt" << endl;
+>>>>>>> fc4a675e947445d17474683ec0d37183afeae9c4
     
     check << "--------------" << endl;
 }
