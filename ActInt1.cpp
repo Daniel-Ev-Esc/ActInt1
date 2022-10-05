@@ -3,6 +3,7 @@ A00831289 Daniel Evaristo Escalera Bonilla
 A01284373 Andres Aguirre Rodriguez
 A00831719 Alberto Horacio Orozco Ramos 
 */
+
 #include<iostream>
 #include<fstream>
 #include<vector>
@@ -11,28 +12,31 @@ A00831719 Alberto Horacio Orozco Ramos
 
 using namespace std;
 
+// Tamaño máximo de las transmisiones
 #define MAXSTR 1001
 
 // Complejidad: O(m*n)
 // Compara dos strings y devuelve el substring más largo encontrado
 string compararStrings(string t1, string t2){
-    //string substring = "A";
 
+    // Variables que permiten manejar y almacenar los strings y el resultado de su comparación
     int m = t1.length();
     int n = t2.length();
     int result = 0;
     int end;
+
+    // El arreglo de dos renglones en donde se irá intercalando el renglón y nos dirá el numero de coincidencias seguidas en ambos strings
     int len[2][MAXSTR];
     int currRow = 0;
  
-    for (int i = 0; i <= m; i++) {
-        for (int j = 0; j <= n; j++) {
+    for (int i = 0; i <= m; i++) { // Por cada caracter en el primer string
+        for (int j = 0; j <= n; j++) { // Recorre el segundo string
             if (i == 0 || j == 0) {
                 len[currRow][j] = 0;
             }
-            else if (t1[i - 1] == t2[j - 1]) {
-                len[currRow][j] = len[1 - currRow][j - 1] + 1;
-                if (len[currRow][j] > result) {
+            else if (t1[i - 1] == t2[j - 1]) { // Cuando se encuentra alguna coincidencia entre ambos strings
+                len[currRow][j] = len[1 - currRow][j - 1] + 1; // Se agrega y almacena con las coincidencias anteriores
+                if (len[currRow][j] > result) { // Si es el mayor numero de coinciencias hasta el momento, se guarda ese dato
                     result = len[currRow][j];
                     end = i - 1;
                 }
@@ -41,24 +45,27 @@ string compararStrings(string t1, string t2){
                 len[currRow][j] = 0;
             }
         }
- 
+
+        // Según el renglón donde se encuentre calcula las coincidencias con ayuda del otro y las almacena
         currRow = 1 - currRow;
     }
     if (result == 0) {
         return "-1";
     }
  
+    // Regresamos el substring en el rango en donde se encontraron mas coincidencias
     return t1.substr(end - result + 1, result);
-    //return substring;
 }
 
-// Complejidad: Pendiente*********************************************************************
+// Complejidad: O(3mn)
+// Donde m y n son los tamaños de los strings y se utilizan en la función interna
 // Busca el substring común más largo en cada par de transmisiones
 void substringMasLargo(vector<string> transmisiones, ofstream& check){
     check << "Los Substring más largos son:" << endl;
     
     string substring;
 
+    // Se realiza la comparación con todos los pares diferentes de transmisiones
     for (int i = 0; i < transmisiones.size(); i++) {
 
         for (int j = i+1; j < transmisiones.size(); j++) {
@@ -77,85 +84,97 @@ void substringMasLargo(vector<string> transmisiones, ofstream& check){
 // Modificación del algoritmo de manacher para que también devuelva el indice de inicio
 pair<int,string> manacher(string tr){
 
+    // Inicializa variables para el manejo de strings y el almacenamiento de resultados
     int n = tr.length();
     string palindromo = "";
 
+    // Se crea un string con los caracteres del original, pero separado por un caracter especial
     for (int i = 0; i < n; i++) {
         palindromo += "-";
         palindromo += tr[i];
     }
     palindromo += "-";
+
+    // Se utiliza este nuevo string para el algoritmo
     n = palindromo.length();
     vector<int> l(n);
 
+    // Incializamos la primera letra
     l[0] = 0;
     l[1] = 1;
 
+    // Valores de control de resultados
     int mLong = 0, mCenter = 0;
     bool e;
 
+    // Definimos variables para saber las posiciones relevantes en el algoritmo y recorrelo hasta el final
     for (int c=1, li=0, ri=2; ri < n; ri++)
     {
         li = c-(ri-c);
         e = false;
         if (c-mLong <= ri && ri >= mLong)
         {
+            // Si el valor en la izquierda es menor a la suma del ultimo valor calculado con su valor actual menos la derecha, li y ri tienen el mismo valor
             if (l[li] < (c+l[c]-ri))
             {
                 l[ri] = l[li];
             }
+            // Si el valor de li es igual a la suma del ultimo valor calculado con su valor actual menos ri y esta suma es dos veces la longitud de n, li y ri tienen el mismo valor
             else if (l[li] == (c+l[c]) - ri && (c+l[c]) == 2*n){
                 l[ri] = l[li];
             }
+            // Si el valor de li es igual a la suma del ultimo valor calculado con su valor actual menos ri y esta suma es menor a dos veces la longitud de n, li y ri tienen el mismo valor y expandimos
             else if (l[li] == (c+l[c]) - ri && (c+l[c]) < 2*n){
                 l[ri] = l[li];
                 e = true;
             }
+            // Si el valor de li es mayor a la suma del ultimo valor calculado con su valor actual menos ri y esta suma es menor a dos veces la longitud de n, li toma el valor de ese cálculo y expandimos
             else if (l[li] > (c+l[c]) - ri && (c+l[c]) < 2*n){
                 l[ri] = (c+l[c]) - ri;
                 e = true;
             }
         }
-        else{
+        else{ // Si ri no se encuentra dentro dle rango entre c y la longitud máxima, su valor es 0 y expandimos
             l[ri] = 0;
             e = true; 
         }
-        if (e)
+        if (e) // Expandir
         {
+            // Mientras se siga encontrando un palindromo en las casillas dentro del rango, aumentamos el valor de la casilla ris
             while ((ri + l[ri] < n) && (ri-l[ri]>0) && (palindromo[ri-l[ri]-1] == palindromo[ri+l[ri]+1]))
             {
                 l[ri]++;
             }
             
         }
-        c = ri;
-        if (l[ri] > mLong)
+        c = ri; // Establecemos el último valor calculado como ri
+        if (l[ri] > mLong) // Si el valor calculado es el más grande que hemos encontrado actualizamos los valores máximos
         {
             mLong = l[ri];
             mCenter = ri;
         } 
     }
-    int ini = (mCenter - mLong)/2;
+    int ini = (mCenter - mLong)/2; // Encontramos el inicio del palíndromo
     string salida ="";
-    for (int i = ini; i < (ini+mLong); i++)
+    for (int i = ini; i < (ini+mLong); i++) // Lo vamos guardando en un string
     {
         salida += tr[i];
     }
 
-    pair<int,string> pal (ini,salida);
+    pair<int,string> pal (ini + 1,salida);
     
     return pal;
 }
 
-// Complejidad: O(n)
+// Complejidad: O(3n)
 // Donde n es la longitud de la transmisión más grande
 // Busca el palíndromo más grande en la transmisión
 void palindromoMasGrande(vector<string> transmisiones, ofstream& check){
     check << "Palíndromo más grande:" << endl;
 
+    // Buscamos en cada transmisión
     for (int i = 0; i < transmisiones.size(); i++)
-    {
-        
+    {   
         pair<int,string> palindromo = manacher(transmisiones[i]);
 
         check << "Transmission" << i+1 << ".txt ==> Posición: " << palindromo.first << endl;
@@ -199,7 +218,6 @@ vector<int> lps (string p) {
 Esta función esta basada en el algoritmo de KMP (Knuth-Morris-Pratt)
 */
 vector<int> revisionCodigo(string codigo, string tr){
-    // Código de cálculo
 
     vector<int> incidencias;
     vector<int> lpsv = lps(codigo);
@@ -229,7 +247,7 @@ vector<int> revisionCodigo(string codigo, string tr){
 }
 
 
-// Complejidad: O(nm)
+// Complejidad: O(n^2 + nm)
 // Donde n es la cantidad de subsecuencias del codigo menos uno diferente y m la longitud del string
 // Obtiene la subsecuencia que más se encuentra en la transmisión
 pair<int,string> encontrarSubsequencia(string codigo, string transmision){
@@ -237,6 +255,7 @@ pair<int,string> encontrarSubsequencia(string codigo, string transmision){
     set<string> grupo;
     vector<pair<int,string>> subseq;
 
+    // Se almacenan las subsequencias menos uno del código
     for (int i = 0; i < codigo.length(); i++) {
         
         string menosuno = "";
@@ -248,6 +267,7 @@ pair<int,string> encontrarSubsequencia(string codigo, string transmision){
         grupo.insert(menosuno);
     }
 
+    // Se buscan las incidencias de cada subsequencia
     for (string x: grupo)
     {
         pair<int,string> reps (0,x);
@@ -256,8 +276,9 @@ pair<int,string> encontrarSubsequencia(string codigo, string transmision){
         subseq.push_back(reps);
     }
 
-    pair<int,string> max (1,"null");
+    pair<int,string> max (0,"null");
 
+    // Se regresa la subsequencia más común
     for (int i = 0; i < subseq.size(); i++)
     {
         if (subseq[i].first > max.first)
@@ -270,14 +291,17 @@ pair<int,string> encontrarSubsequencia(string codigo, string transmision){
     return max;
 }
 
-// Complejidad: Pendiente*********************************************************************
+// Complejidad: O(3n^2 + 3nm)
+// Donde n es la longitud del codigo y m la de la tranmisión más grande
 // Recibe el código a buscar en las transmisiones y despliega las incidencias y su cantidad
 // Asi como la subsequencia con un caracter menos más común
 void incidenciasCodigo(string codigo, vector<string> transmisiones, ofstream& check){
     check << "Código: " << codigo << endl;
     
+    // Para cada transmision
     for (int i = 0; i < transmisiones.size(); i++)
     {
+        // Buscamos sus incidencias del código malicioso y las desplegamos
         vector<int> incidencias = revisionCodigo(codigo,transmisiones[i]);
 
         check << "Transmission" << i+1 << ".txt ==> " << incidencias.size() << "  veces" << endl;
@@ -297,7 +321,7 @@ void incidenciasCodigo(string codigo, vector<string> transmisiones, ofstream& ch
         check << endl;
     }
 
-    
+    // Guardamos las incidencias de las subsecuencias del codigo menos un caracter
     vector<pair<int,string>> subseq;
 
     for (int i = 0; i < transmisiones.size(); i++)
@@ -305,6 +329,7 @@ void incidenciasCodigo(string codigo, vector<string> transmisiones, ofstream& ch
         subseq.push_back(encontrarSubsequencia(codigo, transmisiones[i]));
     }
 
+    // Se busca la más comun y se despliega
     int arch;
     pair<int,string> max (0,"null");
 
